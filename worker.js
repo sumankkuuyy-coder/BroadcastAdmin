@@ -78,11 +78,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
                 </div>
                 <div class="border-t pt-2 space-y-2">
                     <h4 class="text-xs font-bold text-emerald-700">🪪 KYC & Bank</h4>
-                    <input type="text" id="edit-aadhaar" placeholder="Aadhaar No" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono">
                     <input type="text" id="edit-pan" placeholder="PAN No" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono uppercase">
-                    <input type="text" id="edit-bank-acc" placeholder="Account No" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono">
-                    <input type="text" id="edit-bank-ifsc" placeholder="IFSC" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono uppercase">
-                    <input type="text" id="edit-bank-holder" placeholder="Holder Name" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs">
+                    <input type="text" id="edit-bank-details" placeholder="Bank Details (Account / IFSC / Holder)" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs">
                 </div>
             </div>
             <div class="p-3 bg-gray-50 border-t">
@@ -175,11 +172,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
             document.getElementById('edit-sms-wallet').value = u.sms_wallet;
             document.getElementById('edit-earning-wallet').value = u.earning_wallet;
             document.getElementById('edit-bonus-wallet').value = u.bonus_wallet;
-            document.getElementById('edit-aadhaar').value = u.aadhaar_no || '';
             document.getElementById('edit-pan').value = u.pan_no || '';
-            document.getElementById('edit-bank-acc').value = u.bank_acc || '';
-            document.getElementById('edit-bank-ifsc').value = u.bank_ifsc || '';
-            document.getElementById('edit-bank-holder').value = u.bank_holder || '';
+            document.getElementById('edit-bank-details').value = u.bank_details || '';
             document.getElementById('user-detail-modal').classList.remove('hidden');
         }
         function closeUserModal() { document.getElementById('user-detail-modal').classList.add('hidden'); }
@@ -193,11 +187,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
                 sms_wallet: parseFloat(document.getElementById('edit-sms-wallet').value) || 0,
                 earning_wallet: parseFloat(document.getElementById('edit-earning-wallet').value) || 0,
                 bonus_wallet: parseFloat(document.getElementById('edit-bonus-wallet').value) || 0,
-                aadhaar_no: document.getElementById('edit-aadhaar').value,
                 pan_no: document.getElementById('edit-pan').value,
-                bank_acc: document.getElementById('edit-bank-acc').value,
-                bank_ifsc: document.getElementById('edit-bank-ifsc').value,
-                bank_holder: document.getElementById('edit-bank-holder').value
+                bank_details: document.getElementById('edit-bank-details').value
             };
             const res = await fetch('/api/admin/user/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (res.ok) { alert('Updated successfully!'); closeUserModal(); refreshAllAdminData(); }
@@ -258,9 +249,9 @@ export default {
         await env.DB.prepare(`
           UPDATE users SET name = ?, mobile = ?, password = ?, role = ?, 
           sms_wallet = ?, earning_wallet = ?, bonus_wallet = ?, 
-          aadhaar_no = ?, pan_no = ?, bank_acc = ?, bank_ifsc = ?, bank_holder = ? 
+          pan_no = ?, bank_details = ? 
           WHERE id = ?
-        `).bind(b.name, b.mobile, b.password, b.role, b.sms_wallet, b.earning_wallet, b.bonus_wallet, b.aadhaar_no, b.pan_no, b.bank_acc, b.bank_ifsc, b.bank_holder, b.userId).run();
+        `).bind(b.name, b.mobile, b.password, b.role, b.sms_wallet, b.earning_wallet, b.bonus_wallet, b.pan_no, b.bank_details, b.userId).run();
         return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       return new Response("Not Found", { status: 404 });
