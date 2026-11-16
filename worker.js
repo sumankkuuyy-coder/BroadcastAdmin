@@ -164,4 +164,56 @@ const ADMIN_HTML = `<!DOCTYPE html>
             const u = allUsersCache.find(x => x.id === id);
             if (!u) return;
             document.getElementById('edit-user-id').value = u.id;
-            document
+            document.getElementById('modal-user-title').innerText = \`Manage: \${u.name}\`;
+            document.getElementById('edit-name').value = u.name;
+            document.getElementById('edit-mobile').value = u.mobile;
+            document.getElementById('edit-password').value = u.password;
+            document.getElementById('edit-role').value = u.role;
+            document.getElementById('edit-sms-wallet').value = u.sms_wallet;
+            document.getElementById('edit-earning-wallet').value = u.earning_wallet;
+            document.getElementById('edit-bonus-wallet').value = u.bonus_wallet;
+            document.getElementById('edit-pan').value = u.pan_no || '';
+            document.getElementById('edit-bank-details').value = u.bank_details || '';
+            document.getElementById('user-detail-modal').classList.remove('hidden');
+        }
+        function closeUserModal() { document.getElementById('user-detail-modal').classList.add('hidden'); }
+        async function saveUserChangesByAdmin() {
+            const payload = {
+                userId: parseInt(document.getElementById('edit-user-id').value),
+                name: document.getElementById('edit-name').value,
+                mobile: document.getElementById('edit-mobile').value,
+                password: document.getElementById('edit-password').value,
+                role: document.getElementById('edit-role').value,
+                sms_wallet: parseFloat(document.getElementById('edit-sms-wallet').value) || 0,
+                earning_wallet: parseFloat(document.getElementById('edit-earning-wallet').value) || 0,
+                bonus_wallet: parseFloat(document.getElementById('edit-bonus-wallet').value) || 0,
+                pan_no: document.getElementById('edit-pan').value,
+                bank_details: document.getElementById('edit-bank-details').value
+            };
+            const res = await fetch('/api/admin/user/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (res.ok) { alert('Updated successfully!'); closeUserModal(); refreshAllAdminData(); }
+            else { alert('Error updating'); }
+        }
+        function adminLogout() { location.reload(); }
+    </script>
+</body>
+</html>`;
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+    const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" };
+
+    if (method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+    try {
+      if (path === "/" || path === "/admin.html") {
+        return new Response(ADMIN_HTML, { status: 200, headers: { "Content-Type": "text/html" } });
+      }
+      if (path === "/api/login" && method === "POST") {
+        const { mobile, password } = await request.json();
+        const user = await env.DB.prepare("SELECT * FROM users WHERE mobile = ? AND password = ?").bind(mobile, password).first();
+        if (!user) return new Response(JSON.stringify({ error: "Invalid credentials" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ success: true, user }), { status: 200, headers
