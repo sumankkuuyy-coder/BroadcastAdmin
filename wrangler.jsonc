@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "broadcast-admin",
+  "main": "worker-admin.js",
+  "compatibility_date": "2026-11-16",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "broadcast",
+      "database_id": "97573576-4abf-40bf-bb0f-86dc76fb3645"
+    }
+  ]
+}
