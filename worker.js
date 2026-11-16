@@ -244,4 +244,18 @@ export default {
       if (path === "/api/admin/user/update" && method === "POST") {
         const b = await request.json();
         await env.DB.prepare(`
-          UPDATE users SET name = ?,
+          UPDATE users SET name = ?, mobile = ?, password = ?, role = ?, 
+          sms_wallet = ?, earning_wallet = ?, bonus_wallet = ?, 
+          pan_no = ?, bank_details = ? 
+          WHERE id = ?
+        `).bind(b.name, b.mobile, b.password, b.role, b.sms_wallet, b.earning_wallet, b.bonus_wallet, b.pan_no, b.bank_details, b.userId).run();
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      
+      // CATCH-ALL FALLBACK: Prevent "Not Found" error completely
+      return new Response(ADMIN_HTML, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+  }
+};
