@@ -3,1040 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fintech SMS Earning Platform</title>
+    <title>Admin Master Control Panel</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        @keyframes popupIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-popup { animation: popupIn 0.3s ease-out forwards; }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .animate-spin-slow { animation: spin 0.8s linear infinite; }
-
-        /* Dark Mode Overrides */
-        body.dark-mode { background-color: #0f172a; color: #f1f5f9; }
-        body.dark-mode .app-card { background-color: #1e293b; border-color: #334155; color: #f8fafc; }
-        body.dark-mode .app-bg { background-color: #0f172a; }
-        body.dark-mode .app-input { background-color: #334155; border-color: #475569; color: #f8fafc; }
-        body.dark-mode .app-subtext { color: #94a3b8; }
-        body.dark-mode .drawer-panel { background-color: #1e293b; color: #f8fafc; }
-        body.dark-mode .drawer-item:hover { background-color: #334155; color: #60a5fa; }
-        body.dark-mode .drawer-item { color: #e2e8f0; }
-    </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800 flex flex-col items-center justify-center p-0 sm:p-4 transition-colors duration-300">
-
-    <!-- GLOBAL 3-SEC LOADING OVERLAY -->
-    <div id="global-loader" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex flex-col items-center justify-center text-white">
-        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin-slow mb-3"></div>
-        <p id="loader-text" class="text-sm font-semibold tracking-wide">Processing...</p>
-    </div>
-
-    <!-- AUTH SECTION (Login / Register) -->
-    <div id="auth-container" class="app-card bg-white w-full max-w-md min-h-screen sm:min-h-0 sm:rounded-2xl shadow-xl overflow-hidden border border-blue-100 p-6 flex flex-col justify-center">
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-blue-600 tracking-tight">Fintech SMS Earning</h1>
-            <p class="app-subtext text-xs text-gray-500 mt-1">Secure & Fast Simulated Earning Platform</p>
+<body class="bg-gray-100 min-h-screen text-gray-800 flex flex-col items-center p-2 sm:p-4">
+    <div id="admin-login-box" class="bg-white border border-emerald-100 w-full max-w-sm rounded-2xl p-6 shadow-xl my-auto">
+        <div class="text-center mb-5">
+            <h2 class="text-xl font-bold text-emerald-700">🔐 Master Admin Portal</h2>
+            <p class="text-xs text-gray-500 mt-1">Authorized Personnel Only</p>
         </div>
-
-        <div class="flex bg-blue-50 p-1 rounded-xl mb-6 relative">
-            <div id="toggle-bg" class="absolute w-1/2 h-[calc(100%-8px)] top-1 bg-blue-600 rounded-lg shadow-sm transition-all duration-300"></div>
-            <button onclick="switchTab('login')" id="btn-login" class="w-1/2 py-2.5 text-sm font-semibold z-10 text-white transition-colors duration-200">Login</button>
-            <button onclick="switchTab('register')" id="btn-register" class="w-1/2 py-2.5 text-sm font-semibold z-10 text-blue-700 transition-colors duration-200">Register</button>
-        </div>
-
-        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4">
             <div>
-                <label class="app-subtext block text-xs font-semibold text-gray-600 uppercase mb-1">Mobile Number</label>
-                <input type="tel" id="login-mobile" required placeholder="Enter mobile number" class="app-input w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Admin Mobile</label>
+                <input type="tel" id="admin-mobile" required placeholder="Enter admin mobile" class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm">
             </div>
             <div>
-                <label class="app-subtext block text-xs font-semibold text-gray-600 uppercase mb-1">Password</label>
-                <input type="password" id="login-password" required placeholder="Enter password" class="app-input w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Password</label>
+                <input type="password" id="admin-password" required placeholder="Enter password" class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm">
             </div>
-            <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
-                Login
-            </button>
-        </form>
-
-        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-            <div>
-                <label class="app-subtext block text-xs font-semibold text-gray-600 uppercase mb-1">Full Name</label>
-                <input type="text" id="reg-name" required placeholder="Enter your full name" class="app-input w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <label class="app-subtext block text-xs font-semibold text-gray-600 uppercase mb-1">Mobile Number</label>
-                <input type="tel" id="reg-mobile" required placeholder="Enter mobile number" class="app-input w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <label class="app-subtext block text-xs font-semibold text-gray-600 uppercase mb-1">Create Password</label>
-                <input type="password" id="reg-password" required placeholder="Create password" class="app-input w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center text-xs text-blue-800 font-medium">
-                🎁 Get <span class="font-bold">₹100 Sign-up Bonus</span> instantly!
-            </div>
-            <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
-                Register Now
-            </button>
+            <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md">Login to Admin Panel</button>
         </form>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <div id="dashboard-container" class="app-bg bg-gray-50 w-full max-w-md min-h-screen sm:min-h-[700px] sm:rounded-2xl shadow-xl overflow-hidden hidden flex flex-col">
-        
-        <!-- Android App Bar Header (Clean without top logout) -->
-        <div class="bg-blue-700 text-white px-4 py-3.5 flex items-center justify-between shadow-md sticky top-0 z-20">
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleDrawer()" class="p-1 hover:bg-blue-800 rounded-lg transition-all focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-                <h2 id="app-bar-title" class="font-bold text-base tracking-wide">Home</h2>
-            </div>
-            <span class="text-[11px] bg-blue-800 px-2.5 py-1 rounded-full font-semibold">Live</span>
-        </div>
-
-        <!-- VIEW 1: HOME (SMS Task) -->
-        <div id="view-home" class="p-4 space-y-4 flex-1 overflow-y-auto">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl p-4 shadow-md flex items-center justify-between">
-                <div>
-                    <p class="text-xs opacity-80">Welcome back,</p>
-                    <h3 id="home-user-name" class="text-lg font-bold">User</h3>
-                    <p class="text-[11px] mt-0.5 opacity-90">Complete daily SMS tasks & earn rewards.</p>
-                </div>
-                <img id="home-avatar-img" src="" class="w-12 h-12 rounded-full object-cover border-2 border-white hidden">
-            </div>
-
-            <!-- Simulated SMS Task Card -->
-            <div class="app-card bg-white border border-gray-200 rounded-2xl p-4 shadow-xs">
-                <h3 class="font-bold text-xs mb-3 flex items-center justify-between">
-                    <span>📱 Simulated SMS Campaign</span>
-                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">Reward: ₹1.50</span>
-                </h3>
-                
-                <div class="space-y-3">
-                    <div>
-                        <label class="app-subtext block text-[10px] font-semibold text-gray-400 uppercase mb-1">Target Mobile Number (6-Digit Mask)</label>
-                        <input type="text" id="task-mobile" readonly value="+91 98XXXXXX10" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono">
-                    </div>
-                    <div>
-                        <label class="app-subtext block text-[10px] font-semibold text-gray-400 uppercase mb-1">Promotional Content (Amazon Diwali Offer)</label>
-                        <textarea readonly rows="3" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs">Amazon Diwali Mega Sale! Flat 50% cashback on smartphones & electronics. Grab deal now: https://amzn.in/diwali-sale</textarea>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div id="task-progress-box" class="hidden space-y-1">
-                        <div class="flex justify-between text-[10px] font-medium">
-                            <span id="progress-status-text">Connecting...</span>
-                            <span id="progress-percent">0%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                            <div id="progress-bar-fill" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
-                        </div>
-                    </div>
-
-                    <button id="send-sms-btn" onclick="startSmsTask()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md text-xs transition-all active:scale-[0.98]">
-                        Send Promotional SMS (Charge: ₹0.50)
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 2: WALLET SECTION -->
-        <div id="view-wallet" class="p-4 space-y-4 flex-1 overflow-y-auto hidden">
-            <div class="app-card bg-white border border-blue-200 rounded-2xl p-4 shadow-xs">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="app-subtext text-xs font-bold text-gray-500 uppercase">SMS Wallet Balance</p>
-                        <h3 id="bal-sms" class="text-2xl font-bold text-blue-600 mt-1">₹0.00</h3>
-                    </div>
-                    <button onclick="openAddFundModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-xl font-semibold shadow-xs">+ Add Fund</button>
-                </div>
-                <div class="mt-3 pt-2.5 border-t border-gray-200/50 flex justify-between items-center text-xs">
-                    <span class="app-subtext text-gray-500 font-medium">🎁 Included Bonus Balance:</span>
-                    <span id="bal-bonus-inline" class="font-bold text-sky-500">₹0.00</span>
-                </div>
-            </div>
-
-            <div class="app-card bg-white border border-indigo-200 rounded-2xl p-4 shadow-xs">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="app-subtext text-xs font-bold text-gray-500 uppercase">Earning Wallet (Withdrawable)</p>
-                        <h3 id="bal-earning" class="text-2xl font-bold text-indigo-600 mt-1">₹0.00</h3>
-                    </div>
-                    <button onclick="openWithdrawModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-xl font-semibold shadow-xs">Withdraw</button>
-                </div>
-                <p class="app-subtext text-[10px] text-gray-400 mt-2">Min Withdrawal: ₹5,000 | Max: ₹50,000</p>
-            </div>
-
-            <div class="app-card bg-sky-50/10 border border-sky-200 rounded-2xl p-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-xs font-bold text-sky-600 uppercase">Bonus Wallet</p>
-                        <h3 id="bal-bonus" class="text-xl font-bold text-sky-500 mt-1">₹0.00</h3>
-                    </div>
-                    <span class="text-[10px] bg-sky-200 text-sky-800 px-2.5 py-1 rounded-full font-bold">Task Use Only</span>
-                </div>
-                <p class="app-subtext text-[11px] text-gray-500 mt-2">Bonus balance cannot be withdrawn directly, it is automatically used for sending SMS tasks.</p>
-            </div>
-        </div>
-
-        <!-- VIEW 3: TXN HISTORY -->
-        <div id="view-history" class="p-4 space-y-4 flex-1 overflow-y-auto hidden">
-            <div class="flex items-center justify-between">
-                <h3 class="font-bold text-sm">Transaction History</h3>
-                <button onclick="loadUserHistory()" class="text-xs text-blue-600 font-semibold hover:underline">Refresh</button>
-            </div>
-
-            <div class="grid grid-cols-4 bg-gray-200/70 p-1 rounded-xl text-[11px] font-semibold gap-1">
-                <button onclick="switchHistoryTab('sms')" id="tab-sms" class="py-1.5 bg-white text-blue-700 rounded-lg shadow-xs transition-all">Send SMS</button>
-                <button onclick="switchHistoryTab('withdrawals')" id="tab-withdrawals" class="py-1.5 text-gray-600 rounded-lg transition-all">Withdraw</button>
-                <button onclick="switchHistoryTab('funds')" id="tab-funds" class="py-1.5 text-gray-600 rounded-lg transition-all">Add Fund</button>
-                <button onclick="switchHistoryTab('bonus')" id="tab-bonus" class="py-1.5 text-gray-600 rounded-lg transition-all">Bonus</button>
-            </div>
-
-            <div class="space-y-2.5">
-                <div id="history-sms" class="space-y-2"><p class="text-xs text-gray-400 text-center py-6">Loading SMS logs...</p></div>
-                <div id="history-withdrawals" class="space-y-2 hidden"><p class="text-xs text-gray-400 text-center py-6">Loading withdrawals...</p></div>
-                <div id="history-funds" class="space-y-2 hidden"><p class="text-xs text-gray-400 text-center py-6">Loading fund requests...</p></div>
-                <div id="history-bonus" class="space-y-2 hidden">
-                    <div class="app-card bg-white border border-sky-100 p-3 rounded-xl text-xs flex justify-between items-center">
-                        <div>
-                            <p class="font-bold">Sign-Up Welcome Bonus</p>
-                            <p class="app-subtext text-[10px] text-gray-500">Credited on account creation</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-bold text-emerald-500">+₹100.00</span>
-                            <span class="block text-[9px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold mt-1">Credited</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 4: STEP-BY-STEP KYC & BANK DETAILS -->
-        <div id="view-kyc" class="p-4 space-y-4 flex-1 overflow-y-auto hidden">
-            
-            <!-- Step 1: Aadhaar Verification -->
-            <div class="app-card bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-2.5">
-                <div class="flex justify-between items-center">
-                    <h4 class="font-bold text-xs text-blue-600 uppercase">Step 1: Aadhaar Verification</h4>
-                    <span id="badge-aadhaar" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-700">Pending</span>
-                </div>
-                <input type="text" id="kyc-aadhaar" maxlength="12" placeholder="Enter 12-digit Aadhaar Number" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono">
-                <button id="btn-save-aadhaar" onclick="saveAadhaar()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs">Verify & Lock Aadhaar</button>
-                <p class="app-subtext text-[10px] text-gray-400">* Once verified, Aadhaar number cannot be changed.</p>
-            </div>
-
-            <!-- Step 2: PAN Verification -->
-            <div id="step-pan-card" class="app-card bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-2.5 opacity-50 pointer-events-none">
-                <div class="flex justify-between items-center">
-                    <h4 class="font-bold text-xs text-blue-600 uppercase">Step 2: PAN Card Verification</h4>
-                    <span id="badge-pan" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-700">Locked</span>
-                </div>
-                <input type="text" id="kyc-pan" maxlength="10" placeholder="Enter 10-character PAN Number" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono uppercase">
-                <button id="btn-save-pan" onclick="savePan()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs">Verify & Lock PAN</button>
-                <p class="app-subtext text-[10px] text-gray-400">* Once verified, PAN number cannot be changed.</p>
-            </div>
-
-            <!-- Step 3: Bank Account Details (Editable anytime) -->
-            <div id="step-bank-card" class="app-card bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-2.5 opacity-50 pointer-events-none">
-                <div class="flex justify-between items-center">
-                    <h4 class="font-bold text-xs text-blue-600 uppercase">Step 3: Bank Account Details</h4>
-                    <span id="badge-bank" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-600">Required</span>
-                </div>
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">Account Number</label>
-                    <input type="text" id="kyc-bank-acc" placeholder="Enter Bank Account Number" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono">
-                </div>
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">IFSC Code</label>
-                    <input type="text" id="kyc-bank-ifsc" placeholder="Enter IFSC Code" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono uppercase">
-                </div>
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">Account Holder Name</label>
-                    <input type="text" id="kyc-bank-holder" placeholder="Name as per Bank Passbook" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs">
-                </div>
-
-                <button id="btn-save-bank" onclick="saveBankDetails()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs">Save Bank Account</button>
-                <button id="btn-edit-bank" onclick="enableBankEdit()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-xs hidden">Change Bank Account</button>
-            </div>
-        </div>
-
-        <!-- VIEW 5: PROFILE SETTINGS (With Photo Upload) -->
-        <div id="view-profile" class="p-4 space-y-4 flex-1 overflow-y-auto hidden">
-            <div class="app-card bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-3">
-                <div class="text-center mb-3 relative">
-                    <div class="relative w-20 h-20 mx-auto mb-2">
-                        <div id="profile-avatar" class="w-20 h-20 bg-blue-100 text-blue-700 font-bold text-2xl rounded-full flex items-center justify-center shadow-inner overflow-hidden">
-                            <span id="profile-initial">U</span>
-                            <img id="profile-img-preview" src="" class="w-full h-full object-cover hidden">
-                        </div>
-                        <label for="photo-upload" class="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full cursor-pointer shadow-md hover:bg-blue-700 text-xs">
-                            📷
-                        </label>
-                        <input type="file" id="photo-upload" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden">
-                    </div>
-                    <h4 id="profile-name-disp" class="font-bold text-sm">User Name</h4>
-                    <p id="profile-mobile-disp" class="app-subtext text-[11px] text-gray-500 font-mono">+91 XXXXX XXXXX</p>
-                </div>
-
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">Update Full Name</label>
-                    <input type="text" id="edit-name" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">Change Mobile Number</label>
-                    <input type="tel" id="edit-mobile" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">New Password</label>
-                    <input type="password" id="edit-password" placeholder="Leave blank to keep unchanged" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs">
-                </div>
-
-                <button onclick="updateProfile()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all">Update Profile</button>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- 3-LINE NAVIGATION DRAWER -->
-    <div id="nav-drawer" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden flex justify-start">
-        <div class="drawer-panel bg-white w-72 h-full shadow-2xl flex flex-col justify-between transition-colors duration-300">
+    <div id="admin-dashboard" class="bg-white border border-gray-200 w-full max-w-3xl rounded-2xl shadow-xl hidden flex flex-col min-h-[85vh] overflow-hidden">
+        <div class="bg-emerald-700 text-white px-4 py-3.5 flex items-center justify-between">
             <div>
-                <!-- Drawer Header -->
-                <div class="bg-blue-700 text-white p-5 flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <img id="drawer-avatar-img" src="" class="w-10 h-10 rounded-full object-cover border border-white hidden">
-                        <div>
-                            <h3 id="drawer-name" class="font-bold text-sm">User Name</h3>
-                            <p id="drawer-mobile" class="text-[11px] opacity-80 font-mono">+91 XXXXX XXXXX</p>
-                        </div>
+                <h2 class="text-base font-bold">🛡️ Master Admin Control</h2>
+                <p class="text-[11px] text-emerald-100">Payments, Withdrawals & Full User Control</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="refreshAllAdminData()" class="bg-emerald-800 px-3 py-1.5 rounded-lg text-xs font-semibold">🔄 Refresh</button>
+                <button onclick="adminLogout()" class="bg-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold">Logout</button>
+            </div>
+        </div>
+
+        <div class="p-3 bg-gray-50 border-b">
+            <div class="grid grid-cols-3 bg-emerald-100/80 p-1 rounded-xl text-xs font-bold gap-1">
+                <button onclick="switchAdminTab('deposits')" id="tab-btn-deposits" class="py-2.5 bg-emerald-600 text-white rounded-lg shadow-xs">💰 New Deposits <span id="badge-deposits" class="ml-1 bg-white text-emerald-700 px-1.5 rounded-full text-[10px]">0</span></button>
+                <button onclick="switchAdminTab('withdrawals')" id="tab-btn-withdrawals" class="py-2.5 text-emerald-800 rounded-lg">💸 Withdrawals <span id="badge-withdrawals" class="ml-1 bg-emerald-200 text-emerald-900 px-1.5 rounded-full text-[10px]">0</span></button>
+                <button onclick="switchAdminTab('users')" id="tab-btn-users" class="py-2.5 text-emerald-800 rounded-lg">👥 All Users <span id="badge-users" class="ml-1 bg-emerald-200 text-emerald-900 px-1.5 rounded-full text-[10px]">0</span></button>
+            </div>
+        </div>
+
+        <div id="sec-deposits" class="p-4 flex-1 overflow-y-auto space-y-3"><p class="text-xs text-gray-400 text-center py-8">Loading deposits...</p></div>
+        <div id="sec-withdrawals" class="p-4 flex-1 overflow-y-auto space-y-3 hidden"><p class="text-xs text-gray-400 text-center py-8">Loading withdrawals...</p></div>
+        <div id="sec-users" class="p-4 flex-1 overflow-y-auto space-y-3 hidden">
+            <input type="text" id="user-search-input" onkeyup="filterUsersList()" placeholder="🔍 Search user by Name or Mobile..." class="w-full px-3.5 py-2.5 bg-gray-50 border rounded-xl text-xs">
+            <div id="users-list-container" class="space-y-2.5"></div>
+        </div>
+    </div>
+
+    <!-- USER EDIT MODAL -->
+    <div id="user-detail-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl max-h-[92vh] flex flex-col overflow-hidden">
+            <div class="bg-emerald-700 text-white px-4 py-3 flex items-center justify-between">
+                <h3 id="modal-user-title" class="font-bold text-sm">User Full Control</h3>
+                <button onclick="closeUserModal()" class="bg-emerald-800 px-2.5 py-1 rounded-lg text-xs font-bold">✕ Close</button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-3">
+                <input type="hidden" id="edit-user-id">
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[11px] font-bold text-gray-500 uppercase">Name</label><input type="text" id="edit-name" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs"></div>
+                    <div><label class="text-[11px] font-bold text-gray-500 uppercase">Mobile</label><input type="text" id="edit-mobile" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono"></div>
+                    <div><label class="text-[11px] font-bold text-gray-500 uppercase">Password</label><input type="text" id="edit-password" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono"></div>
+                    <div><label class="text-[11px] font-bold text-gray-500 uppercase">Role</label><select id="edit-role" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs"><option value="user">User</option><option value="admin">Admin</option></select></div>
+                </div>
+                <div class="border-t pt-2">
+                    <h4 class="text-xs font-bold text-emerald-700 mb-2">💳 Wallets</h4>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div><label class="text-[10px] font-bold text-emerald-800">SMS Wallet</label><input type="number" step="0.01" id="edit-sms-wallet" class="w-full px-2 py-1.5 border rounded-lg text-xs"></div>
+                        <div><label class="text-[10px] font-bold text-teal-800">Earning Wallet</label><input type="number" step="0.01" id="edit-earning-wallet" class="w-full px-2 py-1.5 border rounded-lg text-xs"></div>
+                        <div><label class="text-[10px] font-bold text-amber-800">Bonus Wallet</label><input type="number" step="0.01" id="edit-bonus-wallet" class="w-full px-2 py-1.5 border rounded-lg text-xs"></div>
                     </div>
-                    <button onclick="toggleDrawer()" class="text-white text-lg font-bold p-1">✕</button>
                 </div>
-
-                <!-- Drawer Menu Items -->
-                <nav class="p-3 space-y-1 text-sm font-medium">
-                    <button onclick="navigate('home')" class="drawer-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-gray-700 transition-all">
-                        <span>🏠</span><span>Home (SMS Task)</span>
-                    </button>
-                    <button onclick="navigate('wallet')" class="drawer-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-gray-700 transition-all">
-                        <span>💳</span><span>Wallet</span>
-                    </button>
-                    <button onclick="navigate('history')" class="drawer-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-gray-700 transition-all">
-                        <span>📊</span><span>Txn History</span>
-                    </button>
-                    <button onclick="navigate('kyc')" class="drawer-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-gray-700 transition-all">
-                        <span>🪪</span><span>KYC & Bank Details</span>
-                    </button>
-                    <button onclick="navigate('profile')" class="drawer-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-gray-700 transition-all">
-                        <span>👤</span><span>Profile Settings</span>
-                    </button>
-                </nav>
-            </div>
-
-            <!-- Bottom Section: Theme Toggle + Red Logout Button -->
-            <div class="p-4 border-t border-gray-200/30 space-y-3">
-                <div class="flex items-center justify-between px-2">
-                    <span class="text-xs font-semibold">App Theme</span>
-                    <button onclick="toggleTheme()" id="theme-toggle-btn" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold transition-all">
-                        🌙 Dark Mode
-                    </button>
-                </div>
-
-                <button onclick="handleLogout()" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center justify-center space-x-2">
-                    <span>🚪</span><span>Logout</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADD FUND MODAL -->
-    <div id="add-fund-modal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden z-50">
-        <div class="app-card bg-white w-full max-w-sm rounded-2xl p-5 text-center shadow-2xl animate-popup">
-            <h3 class="text-sm font-bold mb-1">Add Fund to SMS Wallet</h3>
-            <p class="app-subtext text-[11px] text-gray-500 mb-3">Min: ₹500 | Max: ₹2000</p>
-            
-            <div class="mb-3">
-                <input type="number" id="fund-amount" placeholder="Enter Amount (₹500 - ₹2000)" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs mb-2.5">
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-2.5 inline-block w-full">
-                    <div class="w-28 h-28 bg-white mx-auto border border-blue-300 rounded-lg flex items-center justify-center text-[11px] font-bold text-blue-700 shadow-sm mb-1.5">
-                        [ UPI QR CODE ]
-                    </div>
-                    <p class="text-[10px] text-blue-800 font-semibold">Scan & Pay via UPI</p>
-                    <p id="countdown-timer" class="text-[11px] text-red-600 font-bold mt-0.5">Time Left: 05:00</p>
+                <div class="border-t pt-2 space-y-2">
+                    <h4 class="text-xs font-bold text-emerald-700">🪪 KYC & Bank</h4>
+                    <input type="text" id="edit-pan" placeholder="PAN No" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs font-mono uppercase">
+                    <input type="text" id="edit-bank-details" placeholder="Bank Details (Account / IFSC / Holder)" class="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs">
                 </div>
             </div>
-
-            <div class="mb-3 text-left">
-                <label class="app-subtext block text-[10px] font-semibold text-gray-500 uppercase mb-1">Enter 12-Digit UTR Number</label>
-                <input type="text" id="fund-utr" placeholder="e.g. 3421xxxxxxxx" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono">
+            <div class="p-3 bg-gray-50 border-t">
+                <button onclick="saveUserChangesByAdmin()" class="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-md">💾 Save All Changes</button>
             </div>
-
-            <div class="flex gap-2">
-                <button onclick="closeAddFundModal()" class="w-1/2 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl text-xs">Cancel</button>
-                <button onclick="submitAddFund()" class="w-1/2 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs">Submit UTR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- WITHDRAWAL MODAL -->
-    <div id="withdraw-modal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden z-50">
-        <div class="app-card bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl animate-popup">
-            <h3 class="text-sm font-bold mb-1 text-center">Withdraw Earnings</h3>
-            <p class="app-subtext text-[11px] text-gray-500 mb-3 text-center">Min: ₹5,000 | Max: ₹50,000</p>
-            
-            <div class="space-y-2.5 mb-4">
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-600 uppercase mb-1">Withdrawal Amount (₹)</label>
-                    <input type="number" id="withdraw-amount" placeholder="Enter amount" class="app-input w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="app-subtext block text-[10px] font-semibold text-gray-600 uppercase mb-1">Linked Bank Account (From KYC)</label>
-                    <input type="text" id="withdraw-bank-info" readonly placeholder="Please complete KYC Bank Step first" class="app-input w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-xl text-xs font-mono">
-                </div>
-            </div>
-
-            <div class="flex gap-2">
-                <button onclick="closeWithdrawModal()" class="w-1/2 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl text-xs">Cancel</button>
-                <button onclick="submitWithdrawal()" class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs">Request Payout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- POPUP NOTIFICATION -->
-    <div id="popup-modal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden z-50">
-        <div class="app-card bg-white w-full max-w-sm rounded-2xl p-5 text-center shadow-2xl animate-popup">
-            <div id="popup-icon-container" class="w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl font-bold"></div>
-            <h3 id="popup-title" class="text-base font-bold mb-1"></h3>
-            <p id="popup-message" class="app-subtext text-xs text-gray-600 mb-5"></p>
-            <button onclick="closePopup()" class="w-full py-2.5 bg-gray-900 hover:bg-black text-white font-semibold rounded-xl text-xs">OK</button>
         </div>
     </div>
 
     <script>
-        let currentUser = null;
-        let countdownInterval = null;
-        let isDarkMode = false;
-        let uploadedPhotoBase64 = "";
-
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            const btn = document.getElementById('theme-toggle-btn');
-            if (isDarkMode) {
-                btn.innerText = "☀️ Light Mode";
-                btn.className = "bg-slate-700 text-yellow-300 px-3 py-1 rounded-full text-xs font-bold transition-all";
-            } else {
-                btn.innerText = "🌙 Dark Mode";
-                btn.className = "bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold transition-all";
-            }
-        }
-
-        function simulateLoading(text, callback) {
-            const loader = document.getElementById('global-loader');
-            document.getElementById('loader-text').innerText = text;
-            loader.classList.remove('hidden');
-            setTimeout(() => {
-                loader.classList.add('hidden');
-                if (callback) callback();
-            }, 3000);
-        }
-
-        function switchTab(tab) {
-            const loginForm = document.getElementById('form-login');
-            const regForm = document.getElementById('form-register');
-            const btnLogin = document.getElementById('btn-login');
-            const btnReg = document.getElementById('btn-register');
-            const toggleBg = document.getElementById('toggle-bg');
-
-            if (tab === 'login') {
-                toggleBg.style.transform = 'translateX(0%)';
-                loginForm.classList.remove('hidden');
-                regForm.classList.add('hidden');
-                btnLogin.classList.add('text-white');
-                btnLogin.classList.remove('text-blue-700');
-                btnReg.classList.add('text-blue-700');
-                btnReg.classList.remove('text-white');
-            } else {
-                toggleBg.style.transform = 'translateX(100%)';
-                regForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-                btnReg.classList.add('text-white');
-                btnReg.classList.remove('text-blue-700');
-                btnLogin.classList.add('text-blue-700');
-                btnLogin.classList.remove('text-white');
-            }
-        }
-
-        function toggleDrawer() {
-            document.getElementById('nav-drawer').classList.toggle('hidden');
-        }
-
-        function navigate(view) {
-            toggleDrawer();
-            const views = ['home', 'wallet', 'history', 'kyc', 'profile'];
-            const titles = { home: 'Home', wallet: 'My Wallets', history: 'Transaction History', kyc: 'KYC & Bank Details', profile: 'Profile Settings' };
-            
-            views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.getElementById('app-bar-title').innerText = titles[view];
-
-            if (view === 'history') loadUserHistory();
-            if (view === 'kyc') renderKycSteps();
-        }
-
-        function switchHistoryTab(type) {
-            const tabs = ['sms', 'withdrawals', 'funds', 'bonus'];
-            tabs.forEach(t => {
-                document.getElementById(`history-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).className = "py-1.5 text-gray-600 rounded-lg transition-all";
-            });
-            document.getElementById(`history-${type}`).classList.remove('hidden');
-            document.getElementById(`tab-${type}`).className = "py-1.5 bg-white text-blue-700 rounded-lg shadow-xs transition-all font-bold";
-        }
-
-        function showPopup(type, title, message) {
-            const modal = document.getElementById('popup-modal');
-            const iconContainer = document.getElementById('popup-icon-container');
-            document.getElementById('popup-title').innerText = title;
-            document.getElementById('popup-message').innerText = message;
-
-            if (type === 'success') {
-                iconContainer.className = "w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl bg-blue-100 text-blue-600 font-bold";
-                iconContainer.innerHTML = "✓";
-            } else {
-                iconContainer.className = "w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl bg-red-100 text-red-600 font-bold";
-                iconContainer.innerHTML = "✕";
-            }
-            modal.classList.remove('hidden');
-        }
-
-        function closePopup() {
-            document.getElementById('popup-modal').classList.add('hidden');
-        }
-
-        async function handleRegister(e) {
+        let allUsersCache = [];
+        async function handleAdminLogin(e) {
             e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const mobile = document.getElementById('reg-mobile').value;
-            const password = document.getElementById('reg-password').value;
-
-            simulateLoading("Creating Account...", async () => {
-                try {
-                    const res = await fetch('/api/register', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, mobile, password })
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        showPopup('success', 'Registration Successful!', 'Account created with ₹100 bonus. Please login now.');
-                        switchTab('login');
-                    } else {
-                        showPopup('error', 'Registration Failed', data.error || 'Error creating account.');
-                    }
-                } catch (err) {
-                    showPopup('error', 'Network Error', 'Unable to connect to server.');
-                }
+            const mobile = document.getElementById('admin-mobile').value, password = document.getElementById('admin-password').value;
+            const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mobile, password }) });
+            const data = await res.json();
+            if (res.ok && data.user.role === 'admin') {
+                document.getElementById('admin-login-box').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                refreshAllAdminData();
+            } else { alert('Access Denied: Invalid admin credentials.'); }
+        }
+        function switchAdminTab(tab) {
+            ['deposits', 'withdrawals', 'users'].forEach(t => {
+                document.getElementById('sec-' + t).classList.add('hidden');
+                document.getElementById('tab-btn-' + t).className = 'py-2.5 text-emerald-800 rounded-lg';
             });
+            document.getElementById('sec-' + tab).classList.remove('hidden');
+            document.getElementById('tab-btn-' + tab).className = 'py-2.5 bg-emerald-600 text-white rounded-lg shadow-xs';
         }
+        async function refreshAllAdminData() { await Promise.all([loadRequestsData(), loadAllUsers()]); }
+        async function loadRequestsData() {
+            const res = await fetch('/api/admin/requests');
+            const data = await res.json();
+            if (!res.ok) return;
+            document.getElementById('badge-deposits').innerText = data.funds.filter(f => f.status === 'Pending').length;
+            document.getElementById('badge-withdrawals').innerText = data.withdrawals.filter(w => w.status === 'Pending').length;
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const mobile = document.getElementById('login-mobile').value;
-            const password = document.getElementById('login-password').value;
+            document.getElementById('sec-deposits').innerHTML = data.funds.map(f => `
+                <div class="bg-gray-50 border p-3.5 rounded-xl text-xs space-y-2">
+                    <div class="flex justify-between font-bold"><span>👤 ${f.name} (${f.mobile})</span><span class="text-emerald-700 text-sm">₹${f.amount}</span></div>
+                    <div class="flex justify-between text-[11px] text-gray-500 font-mono"><span>UTR: <b>${f.utr_number}</b></span><span>${f.status}</span></div>
+                    ${f.status === 'Pending' ? `<div class="flex gap-2"><button onclick="adminAction('fund', ${f.id}, 'Approved')" class="w-1/2 py-2 bg-emerald-600 text-white rounded-lg font-bold">✓ Approve</button><button onclick="adminAction('fund', ${f.id}, 'Rejected')" class="w-1/2 py-2 bg-red-600 text-white rounded-lg font-bold">✕ Reject</button></div>` : ''}
+                </div>
+            `).join('') || '<p class="text-xs text-gray-400 text-center py-8">No deposits found.</p>';
 
-            simulateLoading("Logging in...", async () => {
-                try {
-                    const res = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ mobile, password })
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        currentUser = data.user;
-                        showPopup('success', 'Login Successful!', 'Welcome back!');
-                        setTimeout(() => {
-                            closePopup();
-                            loadDashboard();
-                        }, 1000);
-                    } else {
-                        showPopup('error', 'Login Failed', data.error || 'Invalid credentials.');
-                    }
-                } catch (err) {
-                    showPopup('error', 'Network Error', 'Unable to connect to server.');
-                }
-            });
+            document.getElementById('sec-withdrawals').innerHTML = data.withdrawals.map(w => `
+                <div class="bg-gray-50 border p-3.5 rounded-xl text-xs space-y-2">
+                    <div class="flex justify-between font-bold"><span>👤 ${w.name} (${w.mobile})</span><span class="text-teal-700 text-sm">₹${w.amount}</span></div>
+                    <p class="text-[11px] bg-white p-2 rounded border font-mono">Bank: <b>${w.payment_info}</b></p>
+                    ${w.status === 'Pending' ? `<div class="flex gap-2"><button onclick="adminAction('withdrawal', ${w.id}, 'Approved')" class="w-1/2 py-2 bg-emerald-600 text-white rounded-lg font-bold">✓ Approve</button><button onclick="adminAction('withdrawal', ${w.id}, 'Rejected')" class="w-1/2 py-2 bg-red-600 text-white rounded-lg font-bold">✕ Reject & Refund</button></div>` : ''}
+                </div>
+            `).join('') || '<p class="text-xs text-gray-400 text-center py-8">No withdrawals found.</p>';
         }
-
-        function loadDashboard() {
-            document.getElementById('auth-container').classList.add('hidden');
-            document.getElementById('dashboard-container').classList.remove('hidden');
-            
-            document.getElementById('home-user-name').innerText = currentUser.name;
-            document.getElementById('drawer-name').innerText = currentUser.name;
-            document.getElementById('drawer-mobile').innerText = currentUser.mobile;
-
-            updateWalletUI();
-            updateAvatarUI();
-
-            document.getElementById('profile-name-disp').innerText = currentUser.name;
-            document.getElementById('profile-mobile-disp').innerText = currentUser.mobile;
-            document.getElementById('edit-name').value = currentUser.name;
-            document.getElementById('edit-mobile').value = currentUser.mobile;
-
-            renderKycSteps();
+        async function adminAction(type, id, action) {
+            await fetch('/api/admin/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, id, action }) });
+            refreshAllAdminData();
         }
-
-        function updateAvatarUI() {
-            const pic = currentUser.profile_pic;
-            if (pic && pic.startsWith('data:image')) {
-                document.getElementById('profile-initial').classList.add('hidden');
-                const pImg = document.getElementById('profile-img-preview');
-                pImg.src = pic; pImg.classList.remove('hidden');
-
-                const dImg = document.getElementById('drawer-avatar-img');
-                dImg.src = pic; dImg.classList.remove('hidden');
-
-                const hImg = document.getElementById('home-avatar-img');
-                hImg.src = pic; hImg.classList.remove('hidden');
-            } else {
-                document.getElementById('profile-initial').innerText = currentUser.name.charAt(0).toUpperCase();
-            }
+        async function loadAllUsers() {
+            const res = await fetch('/api/admin/users');
+            const data = await res.json();
+            if (!res.ok) return;
+            allUsersCache = data.users || [];
+            document.getElementById('badge-users').innerText = allUsersCache.length;
+            renderUsersList(allUsersCache);
         }
-
-        function updateWalletUI() {
-            document.getElementById('bal-sms').innerText = `₹${currentUser.sms_wallet.toFixed(2)}`;
-            document.getElementById('bal-bonus-inline').innerText = `₹${currentUser.bonus_wallet.toFixed(2)}`;
-            document.getElementById('bal-earning').innerText = `₹${currentUser.earning_wallet.toFixed(2)}`;
-            document.getElementById('bal-bonus').innerText = `₹${currentUser.bonus_wallet.toFixed(2)}`;
+        function renderUsersList(users) {
+            document.getElementById('users-list-container').innerHTML = users.map(u => `
+                <div onclick="openUserModal(${u.id})" class="bg-gray-50 hover:bg-emerald-50 border p-3 rounded-xl cursor-pointer flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-xs">${u.name} <span class="text-[10px] px-2 py-0.5 rounded bg-gray-200">${u.role}</span></div>
+                        <div class="text-[11px] text-gray-500 font-mono">📱 ${u.mobile}</div>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-700">Manage →</span>
+                </div>
+            `).join('') || '<p class="text-xs text-gray-400 text-center py-6">No users found.</p>';
         }
-
-        // STEP-BY-STEP KYC & LOCKING LOGIC
-        function renderKycSteps() {
-            const aadhaarInput = document.getElementById('kyc-aadhaar');
-            const aadhaarBtn = document.getElementById('btn-save-aadhaar');
-            const aadhaarBadge = document.getElementById('badge-aadhaar');
-
-            const panCard = document.getElementById('step-pan-card');
-            const panInput = document.getElementById('kyc-pan');
-            const panBtn = document.getElementById('btn-save-pan');
-            const panBadge = document.getElementById('badge-pan');
-
-            const bankCard = document.getElementById('step-bank-card');
-            const accInput = document.getElementById('kyc-bank-acc');
-            const ifscInput = document.getElementById('kyc-bank-ifsc');
-            const holderInput = document.getElementById('kyc-bank-holder');
-            const saveBankBtn = document.getElementById('btn-save-bank');
-            const editBankBtn = document.getElementById('btn-edit-bank');
-            const bankBadge = document.getElementById('badge-bank');
-
-            // Step 1: Aadhaar
-            if (currentUser.aadhaar_no && currentUser.aadhaar_no.length === 12) {
-                aadhaarInput.value = currentUser.aadhaar_no;
-                aadhaarInput.disabled = true;
-                aadhaarBtn.classList.add('hidden');
-                aadhaarBadge.innerText = "Verified & Locked";
-                aadhaarBadge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700";
-
-                // Unlock Step 2 (PAN)
-                panCard.classList.remove('opacity-50', 'pointer-events-none');
-                panBadge.innerText = "Pending";
-            }
-
-            // Step 2: PAN
-            if (currentUser.pan_no && currentUser.pan_no.length === 10) {
-                panInput.value = currentUser.pan_no;
-                panInput.disabled = true;
-                panBtn.classList.add('hidden');
-                panBadge.innerText = "Verified & Locked";
-                panBadge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700";
-
-                // Unlock Step 3 (Bank)
-                bankCard.classList.remove('opacity-50', 'pointer-events-none');
-            }
-
-            // Step 3: Bank Details
-            if (currentUser.bank_acc && currentUser.bank_acc !== '') {
-                accInput.value = currentUser.bank_acc;
-                ifscInput.value = currentUser.bank_ifsc;
-                holderInput.value = currentUser.bank_holder;
-
-                accInput.disabled = true;
-                ifscInput.disabled = true;
-                holderInput.disabled = true;
-
-                saveBankBtn.classList.add('hidden');
-                editBankBtn.classList.remove('hidden');
-                bankBadge.innerText = "Linked";
-                bankBadge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700";
-
-                document.getElementById('withdraw-bank-info').value = `${currentUser.bank_acc} | ${currentUser.bank_ifsc} | ${currentUser.bank_holder}`;
-            }
+        function filterUsersList() {
+            const q = document.getElementById('user-search-input').value.toLowerCase();
+            renderUsersList(allUsersCache.filter(u => u.name.toLowerCase().includes(q) || u.mobile.includes(q)));
         }
-
-        async function saveAadhaar() {
-            const aadhaar = document.getElementById('kyc-aadhaar').value.trim();
-            if (aadhaar.length !== 12 || isNaN(aadhaar)) {
-                showPopup('error', 'Invalid Aadhaar', 'Please enter a valid 12-digit Aadhaar number.');
-                return;
-            }
-            simulateLoading("Verifying Aadhaar...", async () => {
-                const res = await fetch('/api/kyc/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: currentUser.id, step: 'aadhaar', aadhaar })
-                });
-                if (res.ok) {
-                    currentUser.aadhaar_no = aadhaar;
-                    renderKycSteps();
-                    showPopup('success', 'Aadhaar Verified', 'Aadhaar verified & locked. Proceed to Step 2.');
-                }
-            });
+        function openUserModal(id) {
+            const u = allUsersCache.find(x => x.id === id);
+            if (!u) return;
+            document.getElementById('edit-user-id').value = u.id;
+            document.getElementById('modal-user-title').innerText = `Manage: ${u.name}`;
+            document.getElementById('edit-name').value = u.name;
+            document.getElementById('edit-mobile').value = u.mobile;
+            document.getElementById('edit-password').value = u.password;
+            document.getElementById('edit-role').value = u.role;
+            document.getElementById('edit-sms-wallet').value = u.sms_wallet;
+            document.getElementById('edit-earning-wallet').value = u.earning_wallet;
+            document.getElementById('edit-bonus-wallet').value = u.bonus_wallet;
+            document.getElementById('edit-pan').value = u.pan_no || '';
+            document.getElementById('edit-bank-details').value = u.bank_details || '';
+            document.getElementById('user-detail-modal').classList.remove('hidden');
         }
-
-        async function savePan() {
-            const pan = document.getElementById('kyc-pan').value.trim().toUpperCase();
-            if (pan.length !== 10) {
-                showPopup('error', 'Invalid PAN', 'Please enter a valid 10-character PAN number.');
-                return;
-            }
-            simulateLoading("Verifying PAN...", async () => {
-                const res = await fetch('/api/kyc/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: currentUser.id, step: 'pan', pan })
-                });
-                if (res.ok) {
-                    currentUser.pan_no = pan;
-                    renderKycSteps();
-                    showPopup('success', 'PAN Verified', 'PAN verified & locked. Proceed to Step 3 (Bank Details).');
-                }
-            });
-        }
-
-        function enableBankEdit() {
-            document.getElementById('kyc-bank-acc').disabled = false;
-            document.getElementById('kyc-bank-ifsc').disabled = false;
-            document.getElementById('kyc-bank-holder').disabled = false;
-            document.getElementById('btn-edit-bank').classList.add('hidden');
-            document.getElementById('btn-save-bank').classList.remove('hidden');
-        }
-
-        async function saveBankDetails() {
-            const bank_acc = document.getElementById('kyc-bank-acc').value.trim();
-            const bank_ifsc = document.getElementById('kyc-bank-ifsc').value.trim().toUpperCase();
-            const bank_holder = document.getElementById('kyc-bank-holder').value.trim();
-
-            if (!bank_acc || !bank_ifsc || !bank_holder) {
-                showPopup('error', 'Missing Details', 'Please fill Account Number, IFSC, and Holder Name.');
-                return;
-            }
-
-            simulateLoading("Saving Bank Account...", async () => {
-                const res = await fetch('/api/kyc/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: currentUser.id, step: 'bank', bank_acc, bank_ifsc, bank_holder })
-                });
-                if (res.ok) {
-                    currentUser.bank_acc = bank_acc;
-                    currentUser.bank_ifsc = bank_ifsc;
-                    currentUser.bank_holder = bank_holder;
-                    renderKycSteps();
-                    showPopup('success', 'Bank Account Saved', 'Your bank details are saved and ready for withdrawals.');
-                }
-            });
-        }
-
-        // PROFILE PHOTO UPLOAD (Base64 compression for D1)
-        function handlePhotoUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxSize = 150;
-                    canvas.width = maxSize;
-                    canvas.height = maxSize;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, maxSize, maxSize);
-                    uploadedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    
-                    document.getElementById('profile-initial').classList.add('hidden');
-                    const preview = document.getElementById('profile-img-preview');
-                    preview.src = uploadedPhotoBase64;
-                    preview.classList.remove('hidden');
-                };
-                img.src = e.target.result;
+        function closeUserModal() { document.getElementById('user-detail-modal').classList.add('hidden'); }
+        async function saveUserChangesByAdmin() {
+            const payload = {
+                userId: parseInt(document.getElementById('edit-user-id').value),
+                name: document.getElementById('edit-name').value,
+                mobile: document.getElementById('edit-mobile').value,
+                password: document.getElementById('edit-password').value,
+                role: document.getElementById('edit-role').value,
+                sms_wallet: parseFloat(document.getElementById('edit-sms-wallet').value) || 0,
+                earning_wallet: parseFloat(document.getElementById('edit-earning-wallet').value) || 0,
+                bonus_wallet: parseFloat(document.getElementById('edit-bonus-wallet').value) || 0,
+                pan_no: document.getElementById('edit-pan').value,
+                bank_details: document.getElementById('edit-bank-details').value
             };
-            reader.readAsDataURL(file);
+            const res = await fetch('/api/admin/user/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (res.ok) { alert('Updated successfully!'); closeUserModal(); refreshAllAdminData(); }
+            else { alert('Error updating'); }
         }
-
-        async function updateProfile() {
-            const name = document.getElementById('edit-name').value;
-            const mobile = document.getElementById('edit-mobile').value;
-            const password = document.getElementById('edit-password').value;
-            const profile_pic = uploadedPhotoBase64 || currentUser.profile_pic || '';
-
-            simulateLoading("Updating Profile...", async () => {
-                try {
-                    const res = await fetch('/api/profile/update', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: currentUser.id, name, mobile, password, profile_pic })
-                    });
-                    if (res.ok) {
-                        currentUser.name = name;
-                        currentUser.mobile = mobile;
-                        currentUser.profile_pic = profile_pic;
-                        loadDashboard();
-                        showPopup('success', 'Profile Updated', 'Profile & photo updated successfully.');
-                    } else {
-                        showPopup('error', 'Failed', 'Could not update profile.');
-                    }
-                } catch (err) {
-                    showPopup('error', 'Error', 'Network error.');
-                }
-            });
-        }
-
-        async function loadUserHistory() {
-            try {
-                const res = await fetch(`/api/history?userId=${currentUser.id}`);
-                const data = await res.json();
-                if (res.ok) {
-                    const smsContainer = document.getElementById('history-sms');
-                    smsContainer.innerHTML = data.smsLogs.length === 0 ? `<p class="text-xs text-gray-400 text-center py-6">No SMS logs found.</p>` :
-                        data.smsLogs.map(log => `
-                            <div class="app-card bg-white border border-gray-100 p-3 rounded-xl text-xs flex justify-between items-center shadow-2xs">
-                                <div>
-                                    <p class="font-bold">To: ${log.recipient_number}</p>
-                                    <p class="app-subtext text-[10px] text-gray-500 truncate max-w-[160px]">${log.message_text}</p>
-                                    <span class="text-[9px] text-gray-400">${log.created_at}</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="font-bold text-red-500 text-[11px]">-₹0.50</span>
-                                    <span class="block bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold text-[9px] mt-1">${log.status}</span>
-                                </div>
-                            </div>
-                        `).join('');
-
-                    const withdrawContainer = document.getElementById('history-withdrawals');
-                    withdrawContainer.innerHTML = data.withdrawals.length === 0 ? `<p class="text-xs text-gray-400 text-center py-6">No withdrawals found.</p>` :
-                        data.withdrawals.map(w => `
-                            <div class="app-card bg-white border border-gray-100 p-3 rounded-xl text-xs flex justify-between items-center shadow-2xs">
-                                <div>
-                                    <p class="font-bold">Payout: ₹${w.amount}</p>
-                                    <p class="app-subtext text-[10px] text-gray-500 truncate max-w-[160px]">${w.payment_info}</p>
-                                    <span class="text-[9px] text-gray-400">${w.created_at}</span>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${w.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : w.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${w.status}</span>
-                            </div>
-                        `).join('');
-
-                    const fundsContainer = document.getElementById('history-funds');
-                    fundsContainer.innerHTML = data.fundRequests.length === 0 ? `<p class="text-xs text-gray-400 text-center py-6">No fund requests found.</p>` :
-                        data.fundRequests.map(fund => `
-                            <div class="app-card bg-white border border-gray-100 p-3 rounded-xl text-xs flex justify-between items-center shadow-2xs">
-                                <div>
-                                    <p class="font-bold">Add Fund: ₹${fund.amount}</p>
-                                    <p class="app-subtext text-[10px] text-gray-500 font-mono">UTR: ${fund.utr_number}</p>
-                                    <span class="text-[9px] text-gray-400">${fund.created_at}</span>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${fund.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : fund.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${fund.status}</span>
-                            </div>
-                        `).join('');
-                }
-            } catch (err) {
-                console.error("Failed to load history");
-            }
-        }
-
-        function handleLogout() {
-            document.getElementById('nav-drawer').classList.add('hidden');
-            currentUser = null;
-            document.getElementById('dashboard-container').classList.add('hidden');
-            document.getElementById('auth-container').classList.remove('hidden');
-            showPopup('success', 'Logged Out', 'You have been logged out safely.');
-        }
-
-        async function startSmsTask() {
-            if (currentUser.sms_wallet < 0.50 && currentUser.bonus_wallet < 0.50) {
-                showPopup('error', 'Insufficient Balance', 'Please add funds in Wallet to send SMS.');
-                return;
-            }
-
-            const btn = document.getElementById('send-sms-btn');
-            const progressBox = document.getElementById('task-progress-box');
-            const progressBar = document.getElementById('progress-bar-fill');
-            const statusText = document.getElementById('progress-status-text');
-            const percentText = document.getElementById('progress-percent');
-
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-            progressBox.classList.remove('hidden');
-
-            const duration = Math.floor(Math.random() * (20 - 5 + 1) + 5) * 1000;
-            let elapsed = 0;
-            const intervalTime = 100;
-
-            const timer = setInterval(() => {
-                elapsed += intervalTime;
-                let percent = Math.min(Math.floor((elapsed / duration) * 100), 100);
-                progressBar.style.width = `${percent}%`;
-                percentText.innerText = `${percent}%`;
-
-                if (percent < 40) statusText.innerText = "Connecting Gateway...";
-                else if (percent < 80) statusText.innerText = "Sending Promotional SMS...";
-                else statusText.innerText = "Confirming Delivery...";
-
-                if (elapsed >= duration) {
-                    clearInterval(timer);
-                    completeTask();
-                }
-            }, intervalTime);
-        }
-
-        async function completeTask() {
-            simulateLoading("Crediting Reward...", async () => {
-                try {
-                    const res = await fetch('/api/task/complete', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: currentUser.id })
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        currentUser.sms_wallet = data.sms_wallet;
-                        currentUser.earning_wallet = data.earning_wallet;
-                        currentUser.bonus_wallet = data.bonus_wallet;
-                        updateWalletUI();
-
-                        const randomMid = Math.floor(10 + Math.random() * 89);
-                        document.getElementById('task-mobile').value = `+91 ${randomMid}XXXXXX10`;
-
-                        showPopup('success', 'SMS Delivered!', '₹0.50 deducted & ₹1.50 added to Earning Wallet.');
-                    } else {
-                        showPopup('error', 'Failed', data.error || 'Could not complete task.');
-                    }
-                } catch (err) {
-                    showPopup('error', 'Error', 'Network error.');
-                } finally {
-                    const btn = document.getElementById('send-sms-btn');
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50');
-                    document.getElementById('task-progress-box').classList.add('hidden');
-                    document.getElementById('progress-bar-fill').style.width = '0%';
-                }
-            });
-        }
-
-        function openAddFundModal() {
-            document.getElementById('add-fund-modal').classList.remove('hidden');
-            startCountdown(300);
-        }
-        function closeAddFundModal() {
-            document.getElementById('add-fund-modal').classList.add('hidden');
-            clearInterval(countdownInterval);
-        }
-        function startCountdown(seconds) {
-            let timeLeft = seconds;
-            const timerEl = document.getElementById('countdown-timer');
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                let m = Math.floor(timeLeft / 60);
-                let s = timeLeft % 60;
-                timerEl.innerText = `Time Left: ${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    timerEl.innerText = "QR Expired!";
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
-        async function submitAddFund() {
-            const amount = parseFloat(document.getElementById('fund-amount').value);
-            const utr = document.getElementById('fund-utr').value;
-            if (!amount || amount < 500 || amount > 2000) {
-                alert('Amount must be between ₹500 and ₹2000');
-                return;
-            }
-            if (!utr || utr.length < 10) {
-                alert('Please enter a valid UTR number');
-                return;
-            }
-
-            simulateLoading("Submitting UTR...", async () => {
-                try {
-                    const res = await fetch('/api/fund/add', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: currentUser.id, amount, utr })
-                    });
-                    if (res.ok) {
-                        closeAddFundModal();
-                        showPopup('success', 'Fund Request Submitted', 'Pending admin approval.');
-                    } else {
-                        showPopup('error', 'Failed', 'Could not submit request.');
-                    }
-                } catch (err) {
-                    showPopup('error', 'Error', 'Network error.');
-                }
-            });
-        }
-
-        function openWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.remove('hidden');
-        }
-        function closeWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.add('hidden');
-        }
-
-        async function submitWithdrawal() {
-            const amount = parseFloat(document.getElementById('withdraw-amount').value);
-            const bankInfo = document.getElementById('withdraw-bank-info').value;
-
-            if (!amount || amount < 5000 || amount > 50000) {
-                alert('Withdrawal limit is ₹5,000 to ₹50,000');
-                return;
-            }
-            if (!bankInfo || bankInfo.trim() === '') {
-                alert('Please complete your KYC & Bank Account details first.');
-                return;
-            }
-
-            simulateLoading("Processing Payout...", async () => {
-                try {
-                    const res = await fetch('/api/withdrawal/request', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: currentUser.id, amount, paymentInfo: bankInfo })
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        currentUser.earning_wallet = data.new_earning;
-                        updateWalletUI();
-                        closeWithdrawModal();
-                        showPopup('success', 'Payout Requested', 'Withdrawal request submitted.');
-                    } else {
-                        showPopup('error', 'Failed', data.error || 'Insufficient balance.');
-                    }
-                } catch (err) {
-                    showPopup('error', 'Error', 'Network error.');
-                }
-            });
-        }
+        function adminLogout() { location.reload(); }
     </script>
 </body>
 </html>
